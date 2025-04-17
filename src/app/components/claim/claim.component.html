@@ -1,0 +1,172 @@
+<div class="claims-container">
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-spinner">
+    Loading...
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Info Message about Dependencies -->
+  <div class="alert alert-info" role="alert">
+    <strong>Note:</strong> Before creating a claim, you need to:
+    <ol>
+      <li>First create a Client in the <a routerLink="/client">Clients section</a></li>
+      <li>Then create a Contract in the <a routerLink="/contract">Contracts section</a></li>
+    </ol>
+  </div>
+
+  <!-- Claims Form -->
+  <div class="form-section">
+    <h2>{{ selectedClaimId ? 'Edit Claim' : 'New Claim' }}</h2>
+    <form [formGroup]="claimForm" (ngSubmit)="onSubmit()" class="claim-form">
+      <!-- Title -->
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input 
+          id="title"
+          type="text"
+          formControlName="title"
+          class="form-control"
+          [class.is-invalid]="claimForm.get('title')?.invalid && claimForm.get('title')?.touched"
+        >
+        <div class="invalid-feedback" *ngIf="claimForm.get('title')?.invalid && claimForm.get('title')?.touched">
+          <span *ngIf="claimForm.get('title')?.errors?.['required']">Title is required</span>
+          <span *ngIf="claimForm.get('title')?.errors?.['minlength']">Title must be at least 3 characters</span>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea 
+          id="description"
+          formControlName="description"
+          class="form-control"
+          rows="3"
+          [class.is-invalid]="claimForm.get('description')?.invalid && claimForm.get('description')?.touched"
+        ></textarea>
+        <div class="invalid-feedback" *ngIf="claimForm.get('description')?.invalid && claimForm.get('description')?.touched">
+          <span *ngIf="claimForm.get('description')?.errors?.['required']">Description is required</span>
+          <span *ngIf="claimForm.get('description')?.errors?.['minlength']">Description must be at least 10 characters</span>
+        </div>
+      </div>
+
+      <!-- Damage Type -->
+      <div class="form-group">
+        <label for="damage_type">Damage Type</label>
+        <select 
+          id="damage_type"
+          formControlName="damage_type"
+          class="form-control"
+          [class.is-invalid]="claimForm.get('damage_type')?.invalid && claimForm.get('damage_type')?.touched"
+        >
+          <option value="">Select damage type</option>
+          <option value="HAIL">Hail</option>
+          <option value="WIND">Wind</option>
+          <option value="FLOOD">Flood</option>
+          <option value="EARTHQUAKE">Earthquake</option>
+          <option value="OTHER">Other</option>
+        </select>
+        <div class="invalid-feedback" *ngIf="claimForm.get('damage_type')?.invalid && claimForm.get('damage_type')?.touched">
+          Damage type is required
+        </div>
+      </div>
+
+      <!-- Client ID -->
+      <div class="form-group">
+        <label for="client_id">Client ID</label>
+        <input 
+          id="client_id"
+          type="text"
+          formControlName="client_id"
+          class="form-control"
+          [class.is-invalid]="claimForm.get('client_id')?.invalid && claimForm.get('client_id')?.touched"
+        >
+        <div class="invalid-feedback" *ngIf="claimForm.get('client_id')?.invalid && claimForm.get('client_id')?.touched">
+          Client ID is required
+        </div>
+      </div>
+
+      <!-- Contract ID -->
+      <div class="form-group">
+        <label for="contract_id">Contract ID</label>
+        <input 
+          id="contract_id"
+          type="text"
+          formControlName="contract_id"
+          class="form-control"
+          [class.is-invalid]="claimForm.get('contract_id')?.invalid && claimForm.get('contract_id')?.touched"
+        >
+        <div class="invalid-feedback" *ngIf="claimForm.get('contract_id')?.invalid && claimForm.get('contract_id')?.touched">
+          Contract ID is required
+        </div>
+      </div>
+
+      <!-- Form Buttons -->
+      <div class="form-buttons">
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          [disabled]="!isFormValid() || loading"
+        >
+          {{ selectedClaimId ? 'Update' : 'Create' }} Claim
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="resetForm()"
+        >
+          Reset
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Claims List -->
+  <div class="claims-list">
+    <h2>Claims List</h2>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Damage Type</th>
+            <th>Client ID</th>
+            <th>Contract ID</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let claim of claims">
+            <td>{{ claim.title }}</td>
+            <td>{{ claim.damage_type }}</td>
+            <td>{{ claim.client_id }}</td>
+            <td>{{ claim.contract_id }}</td>
+            <td>
+              <button 
+                class="btn btn-sm btn-info me-2" 
+                (click)="editClaim(claim)"
+              >
+                Edit
+              </button>
+              <!-- Uncomment when delete functionality is implemented
+              <button 
+                class="btn btn-sm btn-danger" 
+                (click)="deleteClaim(claim.id)"
+              >
+                Delete
+              </button>
+              -->
+            </td>
+          </tr>
+          <tr *ngIf="claims.length === 0">
+            <td colspan="5" class="text-center">No claims found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
